@@ -1,0 +1,1457 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>408 答疑</title>
+<script>
+try {
+  var savedTheme = localStorage.getItem('qa-theme');
+  if (savedTheme !== 'light' && savedTheme !== 'dark') {
+    savedTheme = matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+  }
+  document.documentElement.dataset.theme = savedTheme;
+} catch (e) {}
+</script>
+<style>
+  :root {
+    --bg: #e7e1d6;
+    --panel: #f3efe6;
+    --paper: #fffcf7;
+    --ink: #1e1a16;
+    --muted: #6f675c;
+    --line: #e0d7c9;
+    --accent: #9f2d1f;
+    --accent-soft: #f6e6e0;
+    --mark: #f4e2a4;
+    --ds: #0f766e;
+    --co: #b45309;
+    --os: #1d4ed8;
+    --cn: #6d28d9;
+    --mx: #57534e;
+    --shadow: 0 10px 30px rgba(60, 40, 20, .06);
+  }
+  html[data-theme="dark"] {
+    --bg: #12110f;
+    --panel: #1b1916;
+    --paper: #221f1b;
+    --ink: #f3eee6;
+    --muted: #b3aa9e;
+    --line: #3a342c;
+    --accent: #f0a090;
+    --accent-soft: #3d2b26;
+    --mark: #6e5924;
+    --ds: #5eead4;
+    --co: #fbbf24;
+    --os: #93c5fd;
+    --cn: #d8b4fe;
+    --mx: #d6d3d1;
+    --shadow: none;
+  }
+  * { box-sizing: border-box; }
+  html, body { height: 100%; }
+  body {
+    margin: 0;
+    color: var(--ink);
+    background: var(--bg);
+    font-family: "PingFang SC", "Hiragino Sans GB", "Noto Sans SC", "Microsoft YaHei", sans-serif;
+    display: flex;
+    flex-direction: column;
+    height: 100dvh;
+    overflow: hidden;
+  }
+  button, input { font: inherit; color: inherit; }
+  button { cursor: pointer; }
+  :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  header {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    gap: 12px 16px;
+    align-items: center;
+    padding: 14px 18px 10px;
+  }
+  .brand { display: flex; flex-direction: column; gap: 1px; min-width: 92px; }
+  .brand h1 { margin: 0; font-size: 18px; font-weight: 650; letter-spacing: .01em; }
+  .brand p { margin: 0; color: var(--muted); font-size: 12px; }
+  .search {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--paper);
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    padding: 0 12px;
+    min-width: 0;
+    box-shadow: var(--shadow);
+  }
+  .search input {
+    flex: 1;
+    min-width: 0;
+    border: 0;
+    background: transparent;
+    padding: 10px 0;
+    font-size: 16px;
+    outline: none;
+  }
+  .search input::-webkit-search-cancel-button { display: none; }
+  .icon-btn, .text-btn {
+    border: 1px solid var(--line);
+    background: var(--paper);
+    border-radius: 999px;
+  }
+  .icon-btn { width: 28px; height: 28px; padding: 0; color: var(--muted); }
+  .text-btn { padding: 8px 12px; }
+  .filters {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    padding: 0 18px 12px;
+    overflow-x: auto;
+  }
+  .pill, .tag-chip {
+    border: 1px solid var(--line);
+    background: transparent;
+    border-radius: 999px;
+    padding: 6px 11px;
+    color: var(--muted);
+    white-space: nowrap;
+  }
+  .pill[aria-pressed="true"] {
+    background: var(--ink);
+    color: var(--paper);
+    border-color: var(--ink);
+  }
+  .tag-chip { background: var(--accent-soft); color: var(--accent); border-color: transparent; }
+  .tag-bar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    align-items: center;
+    padding: 0 18px 12px;
+    max-height: 112px;
+    overflow: auto;
+  }
+  .tag-bar[hidden] { display: none; }
+  .tag-bar-label {
+    color: var(--muted);
+    font-size: 12px;
+    font-weight: 650;
+    letter-spacing: .08em;
+  }
+  .tag-pill {
+    border: 1px solid var(--line);
+    background: var(--paper);
+    color: var(--ink);
+    border-radius: 999px;
+    padding: 4px 9px;
+    font-size: 12px;
+    white-space: nowrap;
+  }
+  .tag-pill .n { margin-left: 4px; color: var(--muted); font-size: 11px; }
+  .tag-pill[aria-pressed="true"] {
+    background: var(--accent-soft);
+    color: var(--accent);
+    border-color: transparent;
+    font-weight: 650;
+  }
+  .tag-pill[aria-pressed="true"] .n { color: var(--accent); }
+  .body {
+    flex: 1;
+    min-height: 0;
+    display: grid;
+    grid-template-columns: 340px minmax(0, 1fr);
+    gap: 12px;
+    padding: 0 12px 12px;
+  }
+  .list-pane, .detail {
+    min-height: 0;
+    background: var(--paper);
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    box-shadow: var(--shadow);
+  }
+  .list-pane { display: flex; flex-direction: column; background: var(--panel); }
+  .list-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 12px;
+    color: var(--muted);
+    font-size: 12px;
+    border-bottom: 1px solid var(--line);
+  }
+  .list-meta button { border: 0; background: transparent; color: var(--muted); padding: 0; }
+  #list { overflow: auto; padding: 8px; }
+  .item {
+    display: block;
+    width: 100%;
+    text-align: left;
+    border: 0;
+    border-radius: 12px;
+    background: transparent;
+    padding: 10px 10px 10px 12px;
+    margin-bottom: 4px;
+  }
+  .item.is-on { background: var(--accent-soft); box-shadow: inset 3px 0 var(--accent); }
+  .item-top { display: flex; align-items: center; gap: 8px; font-size: 12px; }
+  .item .id { font-weight: 650; }
+  .subj { font-weight: 600; }
+  .subj.ds { color: var(--ds); }
+  .subj.co { color: var(--co); }
+  .subj.os { color: var(--os); }
+  .subj.cn { color: var(--cn); }
+  .subj.mx { color: var(--mx); }
+  .item .date { margin-left: auto; color: var(--muted); }
+  .pic { color: var(--muted); }
+  .teacher-badge {
+    display: inline-block;
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    padding: 0 6px;
+    background: var(--panel);
+    font-size: 12px;
+    line-height: 1.6;
+  }
+  .preview {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    margin-top: 4px;
+    line-height: 1.45;
+    font-size: 14px;
+  }
+  .mini-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    margin-top: 6px;
+  }
+  .mini-tag {
+    background: var(--accent-soft);
+    color: var(--accent);
+    border-radius: 999px;
+    padding: 1px 7px;
+    font-size: 11px;
+    font-weight: 650;
+    line-height: 1.7;
+  }
+  .detail { overflow: auto; padding: 22px 28px 64px; }
+  .back { display: none; margin-bottom: 12px; }
+  .detail-top { display: flex; flex-wrap: wrap; align-items: baseline; gap: 8px 12px; }
+  .detail-top h2 { margin: 0; font-size: 28px; letter-spacing: .02em; }
+  .detail-top .meta { color: var(--muted); }
+  .tag-row { display: flex; flex-wrap: wrap; gap: 6px; margin: 12px 0 18px; }
+  .tag {
+    border: 1px solid transparent;
+    background: var(--accent-soft);
+    color: var(--accent);
+    border-radius: 999px;
+    padding: 4px 10px;
+    font-size: 13px;
+    font-weight: 650;
+  }
+  .tag.is-on { background: var(--accent-soft); color: var(--accent); }
+  .banner {
+    background: var(--accent-soft);
+    color: var(--accent);
+    border-radius: 10px;
+    padding: 8px 10px;
+    margin-bottom: 14px;
+    display: flex;
+    justify-content: space-between;
+    gap: 8px;
+    align-items: center;
+  }
+  .banner button { border: 0; background: transparent; color: inherit; padding: 0; font-weight: 600; }
+  section { margin-top: 22px; }
+  section h3 {
+    margin: 0 0 8px;
+    font-size: 12px;
+    letter-spacing: .12em;
+    color: var(--muted);
+    font-weight: 650;
+  }
+  .prose { margin: 0; white-space: pre-wrap; overflow-wrap: anywhere; line-height: 1.75; font-size: 15.5px; }
+  .q-text {
+    font-family: "Songti SC", "Noto Serif SC", "Source Han Serif SC", Palatino, serif;
+    font-size: 18px;
+    line-height: 1.7;
+  }
+  .caption { color: var(--muted); font-size: 13.5px; }
+  .shots { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 8px; }
+  .shots img {
+    max-width: min(100%, 440px);
+    max-height: 240px;
+    object-fit: contain;
+    background: #fff;
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    cursor: zoom-in;
+  }
+  .shots img[data-loading="1"] { color: var(--muted); font-size: 13.5px; }
+  ul.points { margin: 0; padding-left: 1.15em; }
+  ul.points li { margin: 6px 0; line-height: 1.65; }
+  ul.points li .prose { display: inline; }
+  .related { display: flex; flex-wrap: wrap; gap: 8px; }
+  .related button {
+    border: 1px solid var(--line);
+    background: var(--panel);
+    border-radius: 999px;
+    padding: 6px 10px;
+  }
+  mark { background: var(--mark); color: inherit; border-radius: 2px; }
+  a { color: var(--os); }
+  .empty { color: var(--muted); padding: 28px 8px; }
+  .hint { padding: 0 12px 10px; color: var(--muted); font-size: 11px; }
+  #lb {
+    position: fixed;
+    inset: 0;
+    z-index: 20;
+    background: rgba(16, 13, 10, .9);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  #lb[hidden] { display: none; }
+  #lb img { max-width: 92vw; max-height: 88vh; object-fit: contain; }
+  #lb img[data-loading="1"] { color: #fff; font-size: 13.5px; }
+  .lb-nav, .lb-x {
+    position: absolute;
+    border: 0;
+    background: transparent;
+    color: #fff;
+    font-size: 32px;
+    width: 48px;
+    height: 48px;
+  }
+  .lb-x { top: 12px; right: 12px; }
+  .lb-nav.prev { left: 8px; }
+  .lb-nav.next { right: 8px; }
+  .header-actions { display: flex; gap: 8px; }
+  #gate {
+    position: fixed;
+    inset: 0;
+    z-index: 30;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    background: var(--bg);
+  }
+  #gate[hidden] { display: none; }
+  .login-card {
+    width: min(400px, 100%);
+    background: var(--paper);
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    padding: 28px 24px 22px;
+    box-shadow: var(--shadow);
+  }
+  .login-card h2 { margin: 0 0 6px; font-size: 22px; }
+  .login-card .lead { margin: 0 0 8px; color: var(--muted); line-height: 1.5; }
+  .login-card label { display: block; margin: 14px 0 6px; font-size: 13px; }
+  .login-card input {
+    width: 100%;
+    border: 1px solid var(--line);
+    background: var(--panel);
+    border-radius: 10px;
+    padding: 10px 12px;
+    font-size: 16px;
+  }
+  .login-card button[type="submit"] {
+    width: 100%;
+    margin-top: 18px;
+    border: 0;
+    border-radius: 999px;
+    padding: 11px 14px;
+    background: var(--accent);
+    color: #fff;
+  }
+  .login-error { min-height: 1.4em; margin: 10px 0 0; color: var(--accent); font-size: 13px; }
+  .login-card label.remember {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 16px 0 0;
+    color: var(--muted);
+    font-size: 13px;
+  }
+  .login-card label.remember input { width: auto; margin: 0; padding: 0; }
+  @media (max-width: 860px) {
+    header { grid-template-columns: 1fr auto; padding: 12px 14px 8px; }
+    .search { grid-column: 1 / -1; }
+    .filters, .tag-bar { padding-left: 14px; padding-right: 14px; }
+    .tag-bar { max-height: 88px; }
+    .body { grid-template-columns: 1fr; padding: 0 10px 10px; }
+    .detail { display: none; }
+    body.open .list-pane { display: none; }
+    body.open .detail { display: block; }
+    body.open .back { display: inline-flex; }
+    .detail { padding: 16px 16px 48px; }
+  }
+</style>
+</head>
+<body>
+<header>
+  <div class="brand">
+    <h1>408 答疑</h1>
+    <p>登录后查阅</p>
+  </div>
+  <div class="search">
+    <input id="q" type="search" placeholder="搜索题目、解答、要点、标签、题号" autocomplete="off" enterkeyhint="search" aria-label="搜索">
+    <button type="button" class="icon-btn" id="clear-q" hidden aria-label="清除搜索">×</button>
+  </div>
+  <div class="header-actions">
+    <button type="button" class="text-btn" id="theme">深色</button>
+    <button type="button" class="text-btn" id="logout">退出</button>
+  </div>
+</header>
+<div class="filters" id="filters"></div>
+<div class="filters" id="teacher-filters"></div>
+<div class="tag-bar" id="tag-bar" hidden></div>
+<div class="body">
+  <aside class="list-pane">
+    <div class="list-meta">
+      <span id="count"></span>
+      <button type="button" id="sort"></button>
+    </div>
+    <div id="list"></div>
+    <div class="hint">/ 搜索 · ↑↓ 切换</div>
+  </aside>
+  <main class="detail" id="detail"></main>
+</div>
+<div id="gate">
+  <form class="login-card" id="login-form" method="post" action="#">
+    <h2>408 答疑</h2>
+    <p class="lead" id="gate-lead">输入账号和密码后查看记录。</p>
+    <div id="login-fields">
+      <label for="user">账号</label>
+      <input id="user" name="username" autocomplete="username" required>
+      <label for="pass">密码</label>
+      <input id="pass" name="password" type="password" autocomplete="current-password" required>
+      <label class="remember" for="remember"><input id="remember" type="checkbox" checked>记住我</label>
+      <button type="submit">进入</button>
+    </div>
+    <p class="login-error" id="login-error" role="alert"></p>
+  </form>
+</div>
+<div id="lb" hidden>
+  <button type="button" class="lb-x" data-act="lb-close" aria-label="关闭">×</button>
+  <button type="button" class="lb-nav prev" data-act="lb-prev" aria-label="上一张">‹</button>
+  <img id="lb-img" alt="">
+  <button type="button" class="lb-nav next" data-act="lb-next" aria-label="下一张">›</button>
+</div>
+<script>
+const SUBJECTS = ['数据结构', '计算机组成原理', '操作系统', '计算机网络', '综合'];
+const SHORT = {
+  '数据结构': '数据结构',
+  '计算机组成原理': '计组',
+  '操作系统': '操作系统',
+  '计算机网络': '计网',
+  '综合': '综合'
+};
+const TONE = {
+  '数据结构': 'ds',
+  '计算机组成原理': 'co',
+  '操作系统': 'os',
+  '计算机网络': 'cn',
+  '综合': 'mx'
+};
+
+const state = { items: [], q: '', subject: '', tag: '', teacher: '', sort: 'new', id: '' };
+const TEACHERS = ['🐶', 'B'];
+let mobileDetail = false;
+let lb = { images: [], index: 0 };
+
+const qEl = document.getElementById('q');
+const clearQEl = document.getElementById('clear-q');
+const themeEl = document.getElementById('theme');
+const filtersEl = document.getElementById('filters');
+const teacherFiltersEl = document.getElementById('teacher-filters');
+const tagBarEl = document.getElementById('tag-bar');
+const countEl = document.getElementById('count');
+const sortEl = document.getElementById('sort');
+const listEl = document.getElementById('list');
+const detailEl = document.getElementById('detail');
+const lbEl = document.getElementById('lb');
+const lbImg = document.getElementById('lb-img');
+
+function esc(s) {
+  return String(s ?? '').replace(/[&<>"']/g, ch => ({
+    '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+  }[ch]));
+}
+
+function highlight(escaped, query) {
+  const parts = query.trim().split(/\s+/).filter(Boolean);
+  let out = escaped;
+  for (const part of parts) {
+    const needle = esc(part).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    out = out.replace(new RegExp(needle, 'gi'), m => `<mark>${m}</mark>`);
+  }
+  return out;
+}
+
+function renderRich(text, query) {
+  const raw = String(text ?? '');
+  const re = /(https?:\/\/[^\s]+)/g;
+  let html = '';
+  let last = 0;
+  for (const match of raw.matchAll(re)) {
+    html += highlight(esc(raw.slice(last, match.index)), query);
+    const url = match[1];
+    html += `<a href="${esc(url)}" target="_blank" rel="noopener">${highlight(esc(url), query)}</a>`;
+    last = match.index + url.length;
+  }
+  html += highlight(esc(raw.slice(last)), query);
+  return html;
+}
+
+function captionOf(note) {
+  return String(note || '').replace(/!\[[^\]]*\]\([^)]+\)/g, '').trim();
+}
+
+function safeImg(src) {
+  if (typeof src !== 'string') return '';
+  if (/^images\/[A-Za-z0-9._-]+$/.test(src)) return src;
+  if (src.startsWith('data:image/jpeg;base64,') || src.startsWith('data:image/png;base64,') || src.startsWith('data:image/webp;base64,') || src.startsWith('data:image/gif;base64,')) return src;
+  return '';
+}
+
+function readURL() {
+  const params = new URLSearchParams(location.search);
+  state.q = params.get('q') || '';
+  state.subject = SUBJECTS.includes(params.get('subject')) ? params.get('subject') : '';
+  state.tag = params.get('tag') || '';
+  state.teacher = TEACHERS.includes(params.get('teacher')) ? params.get('teacher') : '';
+  state.sort = params.get('sort') === 'old' ? 'old' : 'new';
+  state.id = decodeURIComponent((location.hash || '').replace(/^#/, ''));
+  mobileDetail = state.id.startsWith('Q');
+}
+
+function syncURL() {
+  try {
+    const url = new URL(location.href);
+    const set = (key, value) => value ? url.searchParams.set(key, value) : url.searchParams.delete(key);
+    set('q', state.q);
+    set('subject', state.subject);
+    set('tag', state.tag);
+    set('teacher', state.teacher);
+    if (state.sort === 'old') url.searchParams.set('sort', 'old');
+    else url.searchParams.delete('sort');
+    url.hash = state.id || '';
+    history.replaceState(null, '', url.pathname + url.search + url.hash);
+  } catch (e) {}
+}
+
+function teacherOf(item) {
+  return item.teacher || '🐶';
+}
+
+function filtered() {
+  const parts = state.q.trim().toLowerCase().split(/\s+/).filter(Boolean);
+  const list = state.items.filter(item => {
+    if (state.subject && item.subject !== state.subject) return false;
+    if (state.teacher && teacherOf(item) !== state.teacher) return false;
+    if (state.tag && !(item.tags || []).includes(state.tag)) return false;
+    if (!parts.length) return true;
+    const hay = [
+      item.id, item.date, item.subject, ...(item.tags || []),
+      item.question, item.answer, item.my_answer || '', item.images_note || '',
+      ...(item.key_points || []), ...(item.related || [])
+    ].join('\n').toLowerCase();
+    return parts.every(part => hay.includes(part));
+  });
+  list.sort((a, b) => state.sort === 'new' ? b.id.localeCompare(a.id) : a.id.localeCompare(b.id));
+  return list;
+}
+
+function settle() {
+  const list = filtered();
+  if (list.length && !list.some(item => item.id === state.id)) state.id = list[0].id;
+}
+
+function themeLabel() {
+  themeEl.textContent = document.documentElement.dataset.theme === 'dark' ? '浅色' : '深色';
+}
+
+function renderFilters() {
+  const allPressed = state.subject === '' ? 'true' : 'false';
+  const pills = [`<button type="button" class="pill" data-act="subject" data-subject="" aria-pressed="${allPressed}">全部</button>`]
+    .concat(SUBJECTS.map(subject => {
+      const pressed = state.subject === subject ? 'true' : 'false';
+      return `<button type="button" class="pill" data-act="subject" data-subject="${esc(subject)}" aria-pressed="${pressed}" title="${esc(subject)}">${esc(SHORT[subject])}</button>`;
+    }));
+  if (state.tag) {
+    pills.push(`<button type="button" class="tag-chip" data-act="clear-tag">标签：${esc(state.tag)} ×</button>`);
+  }
+  filtersEl.innerHTML = pills.join('');
+}
+
+function renderTeacherFilters() {
+  const choices = [['', '全部'], ['🐶', '🐶'], ['B', 'B']];
+  teacherFiltersEl.innerHTML = '<span class="tag-bar-label">老师</span>' + choices.map(([value, label]) => {
+    const pressed = state.teacher === value ? 'true' : 'false';
+    return `<button type="button" class="pill" data-act="teacher" data-teacher="${esc(value)}" aria-pressed="${pressed}">${label}</button>`;
+  }).join('');
+}
+
+function renderTagBar() {
+  const counts = new Map();
+  for (const item of state.items) {
+    if (state.subject && item.subject !== state.subject) continue;
+    if (state.teacher && teacherOf(item) !== state.teacher) continue;
+    for (const tag of item.tags || []) {
+      if (!tag) continue;
+      counts.set(tag, (counts.get(tag) || 0) + 1);
+    }
+  }
+  const names = [...counts.keys()].sort((a, b) => {
+    const diff = (counts.get(b) || 0) - (counts.get(a) || 0);
+    return diff || a.localeCompare(b, 'zh');
+  });
+  if (state.tag && !names.includes(state.tag)) names.unshift(state.tag);
+  if (!names.length) {
+    tagBarEl.hidden = true;
+    tagBarEl.innerHTML = '';
+    return;
+  }
+  tagBarEl.hidden = false;
+  tagBarEl.innerHTML = '<span class="tag-bar-label">标签</span>' + names.map(tag => {
+    const pressed = state.tag === tag ? 'true' : 'false';
+    const n = counts.get(tag) || 0;
+    return `<button type="button" class="tag-pill" data-act="tag" data-tag="${esc(tag)}" aria-pressed="${pressed}">${esc(tag)}<span class="n">${n}</span></button>`;
+  }).join('');
+}
+
+function renderList() {
+  const list = filtered();
+  countEl.textContent = list.length === state.items.length ? `${list.length} 条` : `${list.length} / ${state.items.length} 条`;
+  sortEl.textContent = state.sort === 'new' ? '最新在前' : '最早在前';
+  if (!list.length) {
+    listEl.innerHTML = '<div class="empty">没有匹配的记录。</div>';
+    return;
+  }
+  listEl.innerHTML = list.map(item => {
+    const on = item.id === state.id ? ' is-on' : '';
+    const preview = String(item.question || '').replace(/\s+/g, ' ');
+    const tags = (item.tags || []).filter(Boolean).map(tag => `<span class="mini-tag">${esc(tag)}</span>`).join('');
+    const pic = (item.images || []).length ? '<span class="pic">图</span>' : '';
+    return `<button type="button" class="item${on}" data-act="open" data-id="${esc(item.id)}">
+      <span class="item-top"><span class="id">${esc(item.id)}</span><span class="teacher-badge" title="答疑老师">${esc(teacherOf(item))}</span><span class="subj ${TONE[item.subject] || 'mx'}">${esc(SHORT[item.subject] || item.subject)}</span>${pic}<span class="date">${esc(String(item.date || '').slice(5))}</span></span>
+      <span class="preview">${esc(preview)}</span>
+      <span class="mini-tags">${tags}</span>
+    </button>`;
+  }).join('');
+  const current = listEl.querySelector('.item.is-on');
+  if (current) current.scrollIntoView({ block: 'nearest' });
+}
+
+const imageBlobs = new Map();
+const imageTasks = new Map();
+let paintSeq = 0;
+
+function imageType(src) {
+  const name = String(src || '').toLowerCase();
+  if (name.includes('.png')) return 'image/png';
+  if (name.includes('.webp')) return 'image/webp';
+  if (name.includes('.gif')) return 'image/gif';
+  return 'image/jpeg';
+}
+
+function releaseIn(root) {
+  if (!root) return;
+  const imgs = root.matches && root.matches('img') ? [root] : root.querySelectorAll('img[data-obj], img[data-enc]');
+  imgs.forEach(img => {
+    img.dataset.paint = 'gone';
+    if (img.dataset.obj) {
+      URL.revokeObjectURL(img.dataset.obj);
+      img.removeAttribute('data-obj');
+    }
+  });
+}
+
+function dropImageMemory() {
+  releaseIn(detailEl);
+  releaseIn(lbImg);
+  lbEl.hidden = true;
+  lbImg.removeAttribute('src');
+  lbImg.removeAttribute('data-loading');
+  imageBlobs.clear();
+  imageTasks.clear();
+}
+
+function quietImage(img) {
+  img.removeAttribute('data-loading');
+  img.removeAttribute('width');
+  img.removeAttribute('height');
+  img.removeAttribute('src');
+  img.alt = '';
+  img.hidden = true;
+}
+
+async function encBlob(src) {
+  if (!sessionKey || typeof src !== 'string' || !/\.enc$/i.test(src)) return null;
+  if (imageBlobs.has(src)) return imageBlobs.get(src);
+  let task = imageTasks.get(src);
+  if (!task) {
+    task = (async () => {
+      const response = await fetch(src);
+      if (!response.ok) return null;
+      const packed = new Uint8Array(await response.arrayBuffer());
+      if (packed.length < 28) return null;
+      const plain = await crypto.subtle.decrypt(
+        { name: 'AES-GCM', iv: packed.subarray(0, 12) },
+        sessionKey,
+        packed.subarray(12)
+      );
+      const blob = new Blob([plain], { type: imageType(src) });
+      imageBlobs.set(src, blob);
+      return blob;
+    })().catch(() => null).finally(() => {
+      imageTasks.delete(src);
+    });
+    imageTasks.set(src, task);
+  }
+  return task;
+}
+
+async function paintEnc(img, src) {
+  const seq = String(++paintSeq);
+  img.dataset.paint = seq;
+  img.dataset.loading = '1';
+  img.hidden = false;
+  img.alt = '加载中';
+  img.width = 120;
+  img.height = 80;
+  img.removeAttribute('src');
+  let blob = null;
+  try {
+    blob = await encBlob(src);
+  } catch (e) {
+    blob = null;
+  }
+  if (img.dataset.paint !== seq || !img.isConnected) return;
+  if (!blob) {
+    quietImage(img);
+    return;
+  }
+  const url = URL.createObjectURL(blob);
+  if (img.dataset.paint !== seq || !img.isConnected) {
+    URL.revokeObjectURL(url);
+    return;
+  }
+  img.dataset.obj = url;
+  img.removeAttribute('width');
+  img.removeAttribute('height');
+  img.alt = img.dataset.alt || '';
+  const finish = () => {
+    if (img.dataset.paint === seq) img.removeAttribute('data-loading');
+  };
+  const onError = () => {
+    if (img.dataset.paint !== seq || !img.src.startsWith('blob:')) return;
+    img.removeEventListener('error', onError);
+    if (img.dataset.obj) {
+      URL.revokeObjectURL(img.dataset.obj);
+      img.removeAttribute('data-obj');
+    }
+    quietImage(img);
+  };
+  img.addEventListener('error', onError);
+  img.src = url;
+  if (img.complete && img.naturalWidth) finish();
+  else img.addEventListener('load', finish, { once: true });
+}
+
+function hydrateImages(root) {
+  root.querySelectorAll('img[data-enc]').forEach(img => {
+    paintEnc(img, img.dataset.enc);
+  });
+}
+
+function renderDetail() {
+  releaseIn(detailEl);
+  const list = filtered();
+  const item = state.items.find(entry => entry.id === state.id);
+  if (!list.length) {
+    detailEl.innerHTML = '<div class="empty">没有匹配的记录。换个关键词，或清掉筛选。</div>';
+    document.title = '408 答疑';
+    return;
+  }
+  if (!item) {
+    detailEl.innerHTML = '<div class="empty">从左侧选一条，或直接搜索。</div>';
+    document.title = '408 答疑';
+    return;
+  }
+  document.title = `${item.id} · 408 答疑`;
+  const query = state.q;
+  const inList = list.some(entry => entry.id === item.id);
+  const banner = inList ? '' : '<div class="banner"><span>这条不在当前筛选里</span><button type="button" data-act="clear-all">清除筛选</button></div>';
+  const tags = (item.tags || []).map(tag => {
+    const on = tag === state.tag ? ' is-on' : '';
+    return `<button type="button" class="tag${on}" data-act="tag" data-tag="${esc(tag)}">${esc(tag)}</button>`;
+  }).join('');
+  const images = (item.images || []).map(safeImg).filter(Boolean);
+  const shots = images.map((src, index) => {
+    const alt = `${item.id} 原图 ${index + 1}`;
+    if (/\.enc$/i.test(src)) {
+      return `<img alt="加载中" width="120" height="80" data-alt="${esc(alt)}" data-act="img" data-index="${index}" data-enc="${esc(src)}" data-loading="1">`;
+    }
+    return `<img src="${esc(src)}" alt="${esc(alt)}" data-act="img" data-index="${index}">`;
+  }).join('');
+  const caption = captionOf(item.images_note);
+  const figure = images.length || caption ? `<section><h3>原图</h3>${shots ? `<div class="shots">${shots}</div>` : ''}${caption ? `<p class="prose caption">${renderRich(caption, query)}</p>` : ''}</section>` : '';
+  const reply = item.my_answer ? `<section><h3>答疑回应</h3><p class="prose">${renderRich(item.my_answer, query)}</p></section>` : '';
+  const points = (item.key_points || []).map(point => `<li><span class="prose">${renderRich(point, query)}</span></li>`).join('');
+  const related = (item.related || []).map(id => `<button type="button" data-act="open" data-id="${esc(id)}">${esc(id)}</button>`).join('');
+  detailEl.innerHTML = `
+    <button type="button" class="text-btn back" data-act="back">返回列表</button>
+    ${banner}
+    <div class="detail-top">
+      <h2>${esc(item.id)}</h2>
+      <div class="meta"><span class="teacher-badge" title="答疑老师">${esc(teacherOf(item))}</span> · <span class="subj ${TONE[item.subject] || 'mx'}">${esc(item.subject)}</span> · ${esc(item.date)}</div>
+    </div>
+    <div class="tag-row"><span class="tag-bar-label">标签</span>${tags}</div>
+    ${figure}
+    <section><h3>问题</h3><p class="prose q-text">${renderRich(item.question, query)}</p></section>
+    <section><h3>解答</h3><p class="prose">${renderRich(item.answer, query)}</p></section>
+    ${reply}
+    <section><h3>要点</h3><ul class="points">${points}</ul></section>
+    <section><h3>相关</h3><div class="related">${related || '无'}</div></section>`;
+  detailEl.scrollTop = 0;
+  lb.images = images;
+  hydrateImages(detailEl);
+}
+
+function render() {
+  document.body.classList.toggle('open', mobileDetail);
+  if (document.activeElement !== qEl) qEl.value = state.q;
+  clearQEl.hidden = !state.q;
+  renderFilters();
+  renderTeacherFilters();
+  renderTagBar();
+  renderList();
+  renderDetail();
+  syncURL();
+  themeLabel();
+}
+
+function clearFilters() {
+  state.q = '';
+  state.subject = '';
+  state.teacher = '';
+  state.tag = '';
+  qEl.value = '';
+  settle();
+}
+
+document.getElementById('clear-q').addEventListener('click', () => {
+  state.q = '';
+  qEl.value = '';
+  settle();
+  render();
+  qEl.focus();
+});
+
+qEl.addEventListener('input', () => {
+  state.q = qEl.value;
+  settle();
+  render();
+});
+
+sortEl.addEventListener('click', () => {
+  state.sort = state.sort === 'new' ? 'old' : 'new';
+  settle();
+  render();
+});
+
+themeEl.addEventListener('click', () => {
+  const next = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark';
+  document.documentElement.dataset.theme = next;
+  try { localStorage.setItem('qa-theme', next); } catch (e) {}
+  themeLabel();
+});
+
+document.addEventListener('click', event => {
+  if (event.target === lbEl) closeLb();
+  const target = event.target.closest('[data-act]');
+  if (!target) return;
+  const act = target.dataset.act;
+  if (act === 'open') {
+    state.id = target.dataset.id;
+    mobileDetail = true;
+    render();
+  } else   if (act === 'subject') {
+    const next = target.dataset.subject || '';
+    state.subject = next && state.subject === next ? '' : next;
+    settle();
+    render();
+  } else if (act === 'teacher') {
+    const next = target.dataset.teacher || '';
+    state.teacher = next && state.teacher === next ? '' : next;
+    settle();
+    render();
+  } else if (act === 'tag') {
+    state.tag = state.tag === target.dataset.tag ? '' : target.dataset.tag;
+    settle();
+    render();
+  } else if (act === 'clear-tag') {
+    state.tag = '';
+    settle();
+    render();
+  } else if (act === 'clear-all') {
+    clearFilters();
+    render();
+  } else if (act === 'back') {
+    mobileDetail = false;
+    render();
+  } else if (act === 'img') {
+    openLb(Number(target.dataset.index) || 0);
+  } else if (act === 'lb-close') {
+    closeLb();
+  } else if (act === 'lb-prev') {
+    stepLb(-1);
+  } else if (act === 'lb-next') {
+    stepLb(1);
+  }
+});
+
+function openLb(index) {
+  if (!lb.images.length) return;
+  lb.index = index;
+  const src = lb.images[index];
+  releaseIn(lbImg);
+  lbImg.removeAttribute('src');
+  lbImg.hidden = false;
+  lbEl.hidden = false;
+  lbImg.dataset.alt = `${state.id} 原图 ${index + 1}`;
+  if (typeof src === 'string' && /\.enc$/i.test(src)) paintEnc(lbImg, src);
+  else {
+    lbImg.removeAttribute('data-loading');
+    lbImg.removeAttribute('width');
+    lbImg.removeAttribute('height');
+    lbImg.alt = lbImg.dataset.alt;
+    lbImg.src = src;
+  }
+}
+
+function closeLb() {
+  lbEl.hidden = true;
+  releaseIn(lbImg);
+  lbImg.removeAttribute('src');
+  lbImg.removeAttribute('data-loading');
+  lbImg.removeAttribute('width');
+  lbImg.removeAttribute('height');
+}
+
+function stepLb(delta) {
+  if (!lb.images.length || lbEl.hidden) return;
+  lb.index = (lb.index + delta + lb.images.length) % lb.images.length;
+  openLb(lb.index);
+}
+
+document.addEventListener('keydown', event => {
+  if (!document.body.classList.contains('ready')) return;
+  const typing = document.activeElement === qEl;
+  if (event.key === '/' && !typing) {
+    event.preventDefault();
+    qEl.focus();
+    qEl.select();
+    return;
+  }
+  if (event.key === 'Escape') {
+    if (!lbEl.hidden) closeLb();
+    else if (typing) qEl.blur();
+    else if (mobileDetail) {
+      mobileDetail = false;
+      render();
+    }
+    return;
+  }
+  if (lbEl.hidden === false && (event.key === 'ArrowLeft' || event.key === 'ArrowRight')) {
+    stepLb(event.key === 'ArrowLeft' ? -1 : 1);
+    return;
+  }
+  if (typing) return;
+  if (event.key !== 'ArrowDown' && event.key !== 'ArrowUp') return;
+  const list = filtered();
+  if (!list.length) return;
+  const index = Math.max(0, list.findIndex(item => item.id === state.id));
+  const next = event.key === 'ArrowDown' ? Math.min(list.length - 1, index + 1) : Math.max(0, index - 1);
+  state.id = list[next].id;
+  mobileDetail = window.matchMedia('(max-width: 860px)').matches ? mobileDetail : false;
+  event.preventDefault();
+  render();
+});
+
+const gateEl = document.getElementById('gate');
+const loginForm = document.getElementById('login-form');
+const loginFields = document.getElementById('login-fields');
+const loginError = document.getElementById('login-error');
+const gateLead = document.getElementById('gate-lead');
+
+function showGate(message) {
+  dropImageMemory();
+  document.body.classList.remove('ready');
+  gateEl.hidden = false;
+  loginFields.hidden = false;
+  gateLead.textContent = '输入账号和密码后查看记录。';
+  loginError.textContent = message || '';
+}
+
+const VAULT_CACHE = 'qa-vault';
+const VAULT_URL = 'vault.json';
+const META_KEY = 'qa-vault-meta';
+let sessionKey = null;
+let sessionUser = '';
+let epoch = 0;
+let dbPromise = null;
+
+function openDb() {
+  if (!dbPromise) {
+    dbPromise = new Promise((resolve, reject) => {
+      if (!window.indexedDB) {
+        reject(new Error('idb'));
+        return;
+      }
+      const req = indexedDB.open('qa-session', 1);
+      req.onupgradeneeded = () => {
+        const db = req.result;
+        if (!db.objectStoreNames.contains('kv')) db.createObjectStore('kv');
+      };
+      req.onsuccess = () => resolve(req.result);
+      req.onerror = () => reject(req.error);
+    });
+    dbPromise.catch(() => { dbPromise = null; });
+  }
+  return dbPromise;
+}
+
+function idbGetMany(keys) {
+  return openDb().then(db => new Promise((resolve, reject) => {
+    const tx = db.transaction('kv', 'readonly');
+    const store = tx.objectStore('kv');
+    const out = {};
+    let left = keys.length;
+    if (!left) {
+      resolve(out);
+      return;
+    }
+    keys.forEach(key => {
+      const req = store.get(key);
+      req.onsuccess = () => {
+        out[key] = req.result;
+        if (--left === 0) resolve(out);
+      };
+      req.onerror = () => reject(req.error);
+    });
+  }));
+}
+
+function idbPut(key, value) {
+  return openDb().then(db => new Promise((resolve, reject) => {
+    const tx = db.transaction('kv', 'readwrite');
+    tx.objectStore('kv').put(value, key);
+    tx.oncomplete = () => resolve();
+    tx.onerror = () => reject(tx.error);
+  }));
+}
+
+function idbDelMany(keys) {
+  return openDb().then(db => new Promise((resolve, reject) => {
+    const tx = db.transaction('kv', 'readwrite');
+    const store = tx.objectStore('kv');
+    keys.forEach(key => store.delete(key));
+    tx.oncomplete = () => resolve();
+    tx.onerror = () => reject(tx.error);
+  }));
+}
+
+async function clearStoredSecrets(options) {
+  const keepUser = !!(options && options.keepUser);
+  try {
+    const user = keepUser ? (localStorage.getItem('qa-user') || '') : '';
+    localStorage.removeItem('qa-remember');
+    localStorage.removeItem('qa-vault-fp');
+    if (keepUser) {
+      if (user) localStorage.setItem('qa-user', user);
+    } else {
+      localStorage.removeItem('qa-user');
+    }
+  } catch (e) {}
+  try { await idbDelMany(['aes-key', 'plain']); } catch (e) {}
+}
+
+function readMeta() {
+  try {
+    const raw = localStorage.getItem(META_KEY);
+    return raw ? JSON.parse(raw) : null;
+  } catch (e) {
+    return null;
+  }
+}
+
+function writeMeta(response, fp) {
+  try {
+    localStorage.setItem(META_KEY, JSON.stringify({
+      etag: response.headers.get('etag') || '',
+      lastModified: response.headers.get('last-modified') || '',
+      size: response.headers.get('content-length') || '',
+      fp
+    }));
+  } catch (e) {}
+}
+
+function sameVault(meta, headers) {
+  if (!meta) return false;
+  const etag = headers.get('etag') || '';
+  const lastModified = headers.get('last-modified') || '';
+  const size = headers.get('content-length') || '';
+  if (etag && meta.etag) return etag === meta.etag;
+  if (lastModified && meta.lastModified && lastModified === meta.lastModified) {
+    return !size || !meta.size || size === meta.size;
+  }
+  return false;
+}
+
+function blankRecords() {
+  releaseIn(detailEl);
+  closeLb();
+  state.items = [];
+  state.id = '';
+  listEl.innerHTML = '';
+  detailEl.innerHTML = '';
+}
+
+function bytesFromBase64(value) {
+  const bin = atob(value);
+  const out = new Uint8Array(bin.length);
+  for (let i = 0; i < bin.length; i++) out[i] = bin.charCodeAt(i);
+  return out;
+}
+
+async function sha256Hex(text) {
+  const digest = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(text));
+  return [...new Uint8Array(digest)].map(byte => byte.toString(16).padStart(2, '0')).join('');
+}
+
+function vaultFp(vault) {
+  return [vault.v, vault.user, vault.iterations, vault.salt, vault.iv].join('|');
+}
+
+async function deriveKey(password, vault) {
+  const keyMaterial = await crypto.subtle.importKey(
+    'raw',
+    new TextEncoder().encode(password),
+    'PBKDF2',
+    false,
+    ['deriveKey']
+  );
+  return crypto.subtle.deriveKey(
+    { name: 'PBKDF2', salt: bytesFromBase64(vault.salt), iterations: vault.iterations, hash: 'SHA-256' },
+    keyMaterial,
+    { name: 'AES-GCM', length: 256 },
+    false,
+    ['decrypt']
+  );
+}
+
+async function decryptVault(vault, key) {
+  const plain = await crypto.subtle.decrypt(
+    { name: 'AES-GCM', iv: bytesFromBase64(vault.iv) },
+    key,
+    bytesFromBase64(vault.data)
+  );
+  const data = JSON.parse(new TextDecoder().decode(plain));
+  if (!Array.isArray(data)) throw new Error('bad');
+  return data;
+}
+
+async function storeVault(response, vault) {
+  writeMeta(response, vaultFp(vault));
+  if (!window.caches) return;
+  const headers = new Headers();
+  ['content-type', 'content-length', 'etag', 'last-modified'].forEach(name => {
+    const value = response.headers.get(name);
+    if (value) headers.set(name, value);
+  });
+  const fresh = new Response(await response.blob(), { status: 200, statusText: 'OK', headers });
+  const cache = await caches.open(VAULT_CACHE);
+  await cache.put(VAULT_URL, fresh);
+}
+
+async function readVault() {
+  if (window.caches) {
+    try {
+      const cache = await caches.open(VAULT_CACHE);
+      const cached = await cache.match(VAULT_URL);
+      if (cached) {
+        const vault = await cached.json();
+        if (vault && typeof vault.data === 'string' && vault.salt && vault.iv) {
+          if (!readMeta()) writeMeta(cached, vaultFp(vault));
+          return vault;
+        }
+      }
+    } catch (e) {}
+  }
+  const response = await fetch(VAULT_URL, { cache: 'no-store' });
+  if (!response.ok) throw new Error('missing');
+  const stored = response.clone();
+  const vault = await response.json();
+  try { await storeVault(stored, vault); } catch (e) {}
+  return vault;
+}
+
+async function refreshVault() {
+  const ticket = epoch;
+  let head;
+  try {
+    head = await fetch(VAULT_URL, { method: 'HEAD', cache: 'no-store' });
+  } catch (e) {
+    return;
+  }
+  if (!head.ok || ticket !== epoch) return;
+  const meta = readMeta();
+  if (sameVault(meta, head.headers)) return;
+  let response;
+  try {
+    response = await fetch(VAULT_URL, { cache: 'no-store' });
+  } catch (e) {
+    return;
+  }
+  if (!response.ok || ticket !== epoch) return;
+  const stored = response.clone();
+  let vault;
+  try {
+    vault = await response.json();
+  } catch (e) {
+    return;
+  }
+  if (ticket !== epoch) return;
+  const fp = vaultFp(vault);
+  try { await storeVault(stored, vault); } catch (e) {}
+  if (ticket !== epoch) return;
+  if (meta && meta.fp === fp) return;
+  let key = sessionKey;
+  if (!key) {
+    try {
+      if (localStorage.getItem('qa-remember') === '1') key = (await idbGetMany(['aes-key']))['aes-key'] || null;
+    } catch (e) {}
+  }
+  if (ticket !== epoch) return;
+  const username = sessionUser || (localStorage.getItem('qa-user') || '');
+  if (!key) {
+    if (!document.body.classList.contains('ready')) return;
+    sessionKey = null;
+    sessionUser = '';
+    await clearStoredSecrets({ keepUser: true });
+    if (ticket !== epoch) return;
+    blankRecords();
+    if (username) document.getElementById('user').value = username;
+    showGate('');
+    return;
+  }
+  try {
+    if (username) {
+      const userHash = await sha256Hex(username);
+      if (userHash !== vault.user) throw new Error('auth');
+    }
+    const data = await decryptVault(vault, key);
+    if (ticket !== epoch) return;
+    sessionKey = key;
+    if (username) sessionUser = username;
+    try {
+      if (localStorage.getItem('qa-remember') === '1') {
+        await idbPut('plain', { fp, items: data });
+        if (ticket !== epoch || localStorage.getItem('qa-remember') !== '1') {
+          await idbDelMany(['plain']);
+        } else {
+          localStorage.setItem('qa-vault-fp', fp);
+        }
+      }
+    } catch (e) {}
+    if (ticket !== epoch) return;
+    if (document.body.classList.contains('ready')) showRecords(data);
+  } catch (e) {
+    if (ticket !== epoch) return;
+    sessionKey = null;
+    sessionUser = '';
+    await clearStoredSecrets({ keepUser: true });
+    if (ticket !== epoch) return;
+    blankRecords();
+    if (username) document.getElementById('user').value = username;
+    showGate('');
+  }
+}
+
+async function unlock(username, password) {
+  const vault = await readVault();
+  const userHash = await sha256Hex(username);
+  if (userHash !== vault.user) throw new Error('auth');
+  const key = await deriveKey(password, vault);
+  const data = await decryptVault(vault, key);
+  return { data, key, fp: vaultFp(vault) };
+}
+
+async function openRemembered(username, ticket) {
+  let saved = null;
+  let key = null;
+  try {
+    const bag = await idbGetMany(['plain', 'aes-key']);
+    saved = bag.plain;
+    key = bag['aes-key'] || null;
+  } catch (e) {
+    return false;
+  }
+  if (ticket !== epoch) return true;
+  const fp = localStorage.getItem('qa-vault-fp') || '';
+  if (saved && saved.fp === fp && Array.isArray(saved.items)) {
+    sessionKey = key;
+    sessionUser = username;
+    showRecords(saved.items);
+    if (ticket === epoch) refreshVault();
+    return true;
+  }
+  if (!key) {
+    try { localStorage.removeItem('qa-remember'); } catch (e) {}
+    return false;
+  }
+  let vault;
+  try {
+    vault = await readVault();
+  } catch (e) {
+    return false;
+  }
+  if (ticket !== epoch) return true;
+  try {
+    if (await sha256Hex(username) !== vault.user) throw new Error('auth');
+    const data = await decryptVault(vault, key);
+    const nextFp = vaultFp(vault);
+    if (ticket !== epoch) return true;
+    sessionKey = key;
+    sessionUser = username;
+    showRecords(data);
+    try {
+      await idbPut('plain', { fp: nextFp, items: data });
+      if (ticket !== epoch || localStorage.getItem('qa-remember') !== '1') {
+        await clearStoredSecrets();
+        return true;
+      }
+      localStorage.setItem('qa-vault-fp', nextFp);
+    } catch (e) {}
+    if (ticket === epoch) refreshVault();
+    return true;
+  } catch (e) {
+    if (ticket !== epoch) return true;
+    sessionKey = null;
+    sessionUser = '';
+    await clearStoredSecrets({ keepUser: true });
+    document.getElementById('user').value = username;
+    return false;
+  }
+}
+
+function showRecords(data) {
+  state.items = data;
+  readURL();
+  if (!state.items.some(item => item.id === state.id)) state.id = filtered()[0]?.id || '';
+  qEl.value = state.q;
+  themeLabel();
+  render();
+  gateEl.hidden = true;
+  document.body.classList.add('ready');
+}
+
+loginForm.addEventListener('submit', async event => {
+  event.preventDefault();
+  const ticket = ++epoch;
+  loginError.textContent = '';
+  const button = loginForm.querySelector('button[type="submit"]');
+  const username = document.getElementById('user').value;
+  const password = document.getElementById('pass').value;
+  const remember = document.getElementById('remember').checked;
+  button.disabled = true;
+  button.textContent = '正在打开…';
+  try {
+    const opened = await unlock(username, password);
+    if (ticket !== epoch) return;
+    document.getElementById('pass').value = '';
+    sessionKey = opened.key;
+    sessionUser = username;
+    if (remember) {
+      try {
+        localStorage.setItem('qa-remember', '1');
+        localStorage.setItem('qa-user', username);
+      } catch (e) {}
+      try { await idbPut('aes-key', opened.key); } catch (e) {}
+      try {
+        await idbPut('plain', { fp: opened.fp, items: opened.data });
+        localStorage.setItem('qa-vault-fp', opened.fp);
+      } catch (e) {}
+    } else {
+      await clearStoredSecrets();
+    }
+    if (ticket !== epoch) {
+      await clearStoredSecrets();
+      return;
+    }
+    showRecords(opened.data);
+    refreshVault();
+  } catch (e) {
+    if (ticket === epoch) loginError.textContent = '账号或密码不对。';
+  } finally {
+    if (ticket === epoch) {
+      button.disabled = false;
+      button.textContent = '进入';
+    }
+  }
+});
+
+document.getElementById('logout').addEventListener('click', async () => {
+  epoch++;
+  sessionKey = null;
+  sessionUser = '';
+  blankRecords();
+  document.getElementById('user').value = '';
+  document.getElementById('pass').value = '';
+  await clearStoredSecrets();
+  showGate('');
+});
+
+function boot() {
+  themeLabel();
+  if (!window.crypto?.subtle) {
+    loginFields.hidden = true;
+    gateLead.textContent = '请用浏览器打开公网地址，不要直接双击这个文件。';
+    return;
+  }
+  let remember = false;
+  let username = '';
+  try {
+    remember = localStorage.getItem('qa-remember') === '1';
+    username = localStorage.getItem('qa-user') || '';
+  } catch (e) {}
+  if (username) document.getElementById('user').value = username;
+  if (!remember || !username) {
+    showGate('');
+    return;
+  }
+  const ticket = epoch;
+  loginFields.hidden = true;
+  gateLead.textContent = '正在打开…';
+  openRemembered(username, ticket).then(ok => {
+    if (ticket !== epoch) return;
+    if (!ok) showGate('');
+  }).catch(() => {
+    if (ticket !== epoch) return;
+    showGate('');
+  });
+}
+
+boot();
+</script>
+</body>
+</html>
